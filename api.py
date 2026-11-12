@@ -21,7 +21,14 @@ limiter = Limiter(
 @api.route("/", methods=["GET"])
 @limiter.limit("3/second", override_defaults=False)
 def get():
-    return ("API Works"), 200
+    # For security data is validated on entry
+    if request.args.get("lang") and request.args.get("lang").isalpha():
+        lang = request.args.get("lang")
+        lang = lang.upper()
+        content = dbHandler.extension_get(lang)
+    else:
+        content = dbHandler.extension_get("%")
+    return (content), 200
 
 
 @api.route("/add_extension", methods=["POST"])
